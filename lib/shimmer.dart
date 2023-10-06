@@ -60,11 +60,13 @@ class Shimmer extends StatefulWidget {
   final Gradient gradient;
   final int loop;
   final bool enabled;
+  final AnimationController? controller;
 
   const Shimmer({
     super.key,
     required this.child,
     required this.gradient,
+    this.controller,
     this.direction = ShimmerDirection.ltr,
     this.period = const Duration(milliseconds: 1500),
     this.loop = 0,
@@ -81,27 +83,23 @@ class Shimmer extends StatefulWidget {
     required this.child,
     required Color baseColor,
     required Color highlightColor,
+    this.controller,
     this.period = const Duration(milliseconds: 1500),
     this.direction = ShimmerDirection.ltr,
     this.loop = 0,
     this.enabled = true,
   }) : gradient = LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.centerRight,
-            colors: <Color>[
-              baseColor,
-              baseColor,
-              highlightColor,
-              baseColor,
-              baseColor
-            ],
-            stops: const <double>[
-              0.0,
-              0.35,
-              0.5,
-              0.65,
-              1.0
-            ]);
+          begin: Alignment.topLeft,
+          end: Alignment.centerRight,
+          colors: <Color>[
+            baseColor,
+            baseColor,
+            highlightColor,
+            baseColor,
+            baseColor
+          ],
+          stops: const <double>[0.0, 0.35, 0.5, 0.65, 1.0],
+        );
 
   @override
   _ShimmerState createState() => _ShimmerState();
@@ -127,7 +125,8 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: widget.period)
+    _controller = (widget.controller ?? AnimationController(vsync: this))
+      ..duration = widget.period
       ..addStatusListener((AnimationStatus status) {
         if (status != AnimationStatus.completed) {
           return;
@@ -168,11 +167,11 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
     );
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _controller.dispose();
+  //   super.dispose();
+  // }
 }
 
 @immutable
